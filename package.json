@@ -1,0 +1,17 @@
+{
+  "name": "ecotrack-ai",
+  "version": "1.0.0",
+  "description": "EcoTrack AI – Personal Carbon Footprint Assistant",
+  "private": true,
+  "scripts": {
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "install:all": "cd client && npm install && cd ../server && npm install",
+    "test:server": "cd server && npm test",
+    "test:client": "cd client && npm test"
+  },
+  "keywords": ["carbon-footprint", "sustainability", "eco-track", "ai", "gcp"],
+  "license": "MIT"
+}
