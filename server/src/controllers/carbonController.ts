@@ -121,7 +121,7 @@ export async function getEntries(req: Request, res: Response, next: NextFunction
     let entries = snapshot.docs.map((doc: any) => doc.data() as CarbonEntry);
 
     // Sort entries by date descending (lexicographical comparison)
-    entries.sort((a: CarbonEntry, b: CarbonEntry) => b.date.localeCompare(a.date));
+    entries.sort((a: CarbonEntry, b: CarbonEntry) => (b.date > a.date ? 1 : b.date < a.date ? -1 : 0));
 
     // Apply manual date filters if parameters are present
     if (startDate) {

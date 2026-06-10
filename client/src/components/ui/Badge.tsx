@@ -23,7 +23,7 @@ const sizeClasses = {
   md: 'px-3 py-1 text-sm',
 };
 
-const Badge = React.memo(function Badge({
+export default function Badge({
   variant = 'default',
   children,
   className = '',
@@ -43,6 +43,4 @@ const Badge = React.memo(function Badge({
       {children}
     </span>
   );
-});
-
-export default Badge;
+}

@@ -14,7 +14,7 @@ interface StatCardProps {
   delay?: number;
 }
 
-const StatCard = React.memo(function StatCard({
+export default function StatCard({
   label,
   value,
   icon,
@@ -87,6 +87,4 @@ const StatCard = React.memo(function StatCard({
       </Card>
     </motion.div>
   );
-});
-
-export default StatCard;
+}
