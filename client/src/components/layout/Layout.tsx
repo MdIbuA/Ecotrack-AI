@@ -35,6 +35,10 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-950 flex">
+      {/* Skip to main content link for accessibility */}
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded-lg">
+        Skip to main content
+      </a>
       {/* Mobile overlay */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -72,13 +76,14 @@ export default function Layout({ children }: LayoutProps) {
             <button
               className="ml-auto lg:hidden p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-800"
               onClick={() => setSidebarOpen(false)}
+              aria-label="Close sidebar menu"
             >
               <FiX className="w-5 h-5 text-gray-500" />
             </button>
           </div>
 
           {/* Nav */}
-          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
+          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar" role="navigation" aria-label="Main navigation">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -91,9 +96,14 @@ export default function Layout({ children }: LayoutProps) {
                       : 'text-gray-600 dark:text-dark-400 hover:bg-gray-100 dark:hover:bg-dark-800 hover:text-gray-900 dark:hover:text-white'
                   }`
                 }
+                end={item.to === '/dashboard'}
               >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
-                {item.label}
+                {({ isActive }) => (
+                  <>
+                    <item.icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+                    <span {...(isActive ? { 'aria-current': 'page' as const } : {})}>{item.label}</span>
+                  </>
+                )}
               </NavLink>
             ))}
           </nav>
@@ -103,6 +113,7 @@ export default function Layout({ children }: LayoutProps) {
             <button
               onClick={toggleTheme}
               className="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-dark-400 hover:bg-gray-100 dark:hover:bg-dark-800 transition-colors"
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {isDark ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
               {isDark ? 'Light Mode' : 'Dark Mode'}
@@ -110,6 +121,7 @@ export default function Layout({ children }: LayoutProps) {
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+              aria-label="Sign out of your account"
             >
               <FiLogOut className="w-5 h-5" />
               Sign Out
@@ -121,11 +133,12 @@ export default function Layout({ children }: LayoutProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-white/70 dark:bg-dark-900/70 backdrop-blur-xl border-b border-gray-200 dark:border-dark-800 px-4 lg:px-8 py-3">
+        <header className="sticky top-0 z-30 bg-white/70 dark:bg-dark-900/70 backdrop-blur-xl border-b border-gray-200 dark:border-dark-800 px-4 lg:px-8 py-3" role="banner">
           <div className="flex items-center justify-between">
             <button
               className="lg:hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-dark-800 text-gray-600 dark:text-dark-400"
               onClick={() => setSidebarOpen(true)}
+              aria-label="Open sidebar menu"
             >
               <FiMenu className="w-5 h-5" />
             </button>
@@ -146,7 +159,7 @@ export default function Layout({ children }: LayoutProps) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-8">
+        <main className="flex-1 p-4 lg:p-8" role="main" aria-label="Main content" id="main-content">
           <div className="max-w-7xl mx-auto gradient-mesh min-h-full rounded-2xl">
             {children}
           </div>

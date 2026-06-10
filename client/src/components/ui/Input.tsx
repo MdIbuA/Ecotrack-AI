@@ -9,7 +9,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, icon, rightIcon, helperText, className = '', id, ...props }, ref) => {
+  ({ label, error, icon, rightIcon, helperText, className = '', id, required, ...props }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-') || undefined;
 
     return (
@@ -45,6 +45,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             `}
             aria-invalid={error ? 'true' : 'false'}
             aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
+            aria-required={required ? 'true' : undefined}
+            required={required}
             {...props}
           />
           {rightIcon && (

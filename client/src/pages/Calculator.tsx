@@ -94,7 +94,7 @@ export default function Calculator() {
     <Layout>
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Step Indicator */}
-        <div className="flex justify-between items-center bg-white dark:bg-dark-900 px-6 py-4 rounded-2xl shadow-sm border border-gray-100 dark:border-dark-800 overflow-x-auto">
+        <div className="flex justify-between items-center bg-white dark:bg-dark-900 px-6 py-4 rounded-2xl shadow-sm border border-gray-100 dark:border-dark-800 overflow-x-auto" role="navigation" aria-label="Calculator step navigation">
           {stepsList.map((s, idx) => {
             const stepNum = idx + 1;
             const isCompleted = step > stepNum;
@@ -126,13 +126,13 @@ export default function Calculator() {
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm" role="alert" aria-live="assertive">
             {error}
           </div>
         )}
 
         {/* Live Running Total Counter */}
-        <div className="bg-gradient-to-r from-primary-500/10 to-accent-500/10 border border-primary-500/20 rounded-2xl p-4 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-primary-500/10 to-accent-500/10 border border-primary-500/20 rounded-2xl p-4 flex items-center justify-between" role="progressbar" aria-valuenow={Math.round(runningTotal * 100) / 100} aria-valuemin={0} aria-label={`Live footprint estimate: ${runningTotal.toFixed(2)} kg CO2`}>
           <div>
             <h4 className="text-sm font-semibold text-gray-900 dark:text-white">Live Footprint Estimate</h4>
             <p className="text-xs text-gray-500 dark:text-dark-400">Total accumulated for this entry</p>
@@ -368,6 +368,7 @@ export default function Calculator() {
                       value={recyclingRate}
                       onChange={(e) => setRecyclingRate(Number(e.target.value))}
                       className="w-full h-2 bg-gray-200 dark:bg-dark-800 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                      aria-label={`Recycling percentage: ${recyclingRate}%`}
                     />
                   </div>
                 </div>

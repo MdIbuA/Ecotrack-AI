@@ -21,7 +21,7 @@ const variantClasses: Record<CardVariant, string> = {
     'bg-gradient-to-br from-primary-500/10 via-accent-500/5 to-primary-500/10 dark:from-primary-500/15 dark:via-accent-500/10 dark:to-primary-500/15 backdrop-blur-xl border border-primary-500/20 dark:border-primary-500/20 shadow-lg shadow-primary-500/5',
 };
 
-export default function Card({
+const Card = React.memo(function Card({
   variant = 'glass',
   children,
   className = '',
@@ -49,4 +49,6 @@ export default function Card({
       {children}
     </motion.div>
   );
-}
+});
+
+export default Card;

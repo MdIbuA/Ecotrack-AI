@@ -143,18 +143,18 @@ export default function Profile() {
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Edit Profile details</h3>
 
               {success && (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 p-3 rounded-lg text-sm mb-4">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 p-3 rounded-lg text-sm mb-4" role="alert" aria-live="polite">
                   {success}
                 </div>
               )}
 
               {error && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-lg text-sm mb-4">
+                <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-lg text-sm mb-4" role="alert" aria-live="assertive">
                   {error}
                 </div>
               )}
 
-              <form onSubmit={handleUpdateProfile} className="space-y-4">
+              <form onSubmit={handleUpdateProfile} className="space-y-4" aria-label="Edit profile form">
                 <Input
                   label="Display Name"
                   value={displayName}
@@ -192,6 +192,7 @@ export default function Profile() {
                   type="button"
                   onClick={toggleTheme}
                   className="p-2.5 rounded-xl border border-gray-200 dark:border-dark-800 bg-white/5 hover:bg-white/10 text-gray-700 dark:text-white transition-all shadow-sm"
+                  aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
                 >
                   {isDark ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
                 </button>
@@ -214,6 +215,8 @@ export default function Profile() {
                           ? 'border-primary-500 bg-primary-500/10 text-primary-600 dark:text-primary-400'
                           : 'border-gray-200 dark:border-dark-800 hover:bg-gray-50 dark:hover:bg-dark-800'
                       }`}
+                      aria-label={`Use ${unit} units`}
+                      aria-pressed={unitSystem === unit}
                     >
                       {unit}
                     </button>

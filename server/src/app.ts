@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -24,8 +24,19 @@ app.use((req, res, next) => {
   next();
 });
 
-// Helmet for security headers
-app.use(helmet());
+// Helmet for security headers with Content Security Policy
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'", 'https://*.googleapis.com', 'https://*.firebaseio.com', 'https://*.run.app'],
+    },
+  },
+}));
 
 // CORS configuration - allowing local frontend dev server and production domains
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
@@ -45,6 +56,23 @@ app.use(cors({
 // Express body parsers (limit set to 10MB to accommodate receipt base64 uploads)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Sanitize request body to prevent NoSQL injection
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  if (req.body) {
+    const sanitize = (obj: Record<string, unknown>): void => {
+      for (const key of Object.keys(obj)) {
+        if (typeof obj[key] === 'string') {
+          obj[key] = (obj[key] as string).replace(/[\$]/g, '');
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          sanitize(obj[key] as Record<string, unknown>);
+        }
+      }
+    };
+    sanitize(req.body);
+  }
+  next();
+});
 
 // Rate limiting to protect against brute force / denial of service
 const limiter = rateLimit({

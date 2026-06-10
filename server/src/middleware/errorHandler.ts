@@ -11,12 +11,12 @@ export class AppError extends Error {
  * Global Express Error Handler Middleware
  */
 export function errorHandler(
-  err: any,
+  err: Error | AppError,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void {
-  const statusCode = err.statusCode || 500;
+  const statusCode = err instanceof AppError ? err.statusCode : ((err as any).statusCode || 500);
   const message = err.message || 'An unexpected error occurred';
 
   if (process.env.NODE_ENV !== 'production' && statusCode === 500) {

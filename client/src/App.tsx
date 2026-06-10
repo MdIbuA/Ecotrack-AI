@@ -5,17 +5,25 @@ import { AuthProvider, useAuth } from './context/AuthContext.js';
 import { CarbonProvider } from './context/CarbonContext.js';
 import LoadingSpinner from './components/ui/LoadingSpinner.js';
 
-// Import Pages
-import Login from './pages/Login.js';
-import Register from './pages/Register.js';
-import ForgotPassword from './pages/ForgotPassword.js';
-import Dashboard from './pages/Dashboard.js';
-import Calculator from './pages/Calculator.js';
-import Goals from './pages/Goals.js';
-import AiCoach from './pages/AiCoach.js';
-import ReceiptScanner from './pages/ReceiptScanner.js';
-import Reports from './pages/Reports.js';
-import Profile from './pages/Profile.js';
+// Lazy-loaded Pages for code splitting
+const Login = React.lazy(() => import('./pages/Login.js'));
+const Register = React.lazy(() => import('./pages/Register.js'));
+const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword.js'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard.js'));
+const Calculator = React.lazy(() => import('./pages/Calculator.js'));
+const Goals = React.lazy(() => import('./pages/Goals.js'));
+const AiCoach = React.lazy(() => import('./pages/AiCoach.js'));
+const ReceiptScanner = React.lazy(() => import('./pages/ReceiptScanner.js'));
+const Reports = React.lazy(() => import('./pages/Reports.js'));
+const Achievements = React.lazy(() => import('./pages/Achievements.js'));
+const Profile = React.lazy(() => import('./pages/Profile.js'));
+
+// Suspense fallback component for lazy-loaded routes
+const SuspenseFallback = () => (
+  <div className="min-h-screen bg-gray-50 dark:bg-dark-950 flex items-center justify-center">
+    <LoadingSpinner size="lg" label="Loading page..." />
+  </div>
+);
 
 // Route Guard for Protected Pages
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -61,65 +69,72 @@ export default function App() {
       <AuthProvider>
         <CarbonProvider>
           <BrowserRouter>
-            <Routes>
-              {/* Public Auth Routes */}
-              <Route path="/login" element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              } />
-              <Route path="/register" element={
-                <PublicRoute>
-                  <Register />
-                </PublicRoute>
-              } />
-              <Route path="/forgot-password" element={
-                <PublicRoute>
-                  <ForgotPassword />
-                </PublicRoute>
-              } />
+            <React.Suspense fallback={<SuspenseFallback />}>
+              <Routes>
+                {/* Public Auth Routes */}
+                <Route path="/login" element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                } />
+                <Route path="/register" element={
+                  <PublicRoute>
+                    <Register />
+                  </PublicRoute>
+                } />
+                <Route path="/forgot-password" element={
+                  <PublicRoute>
+                    <ForgotPassword />
+                  </PublicRoute>
+                } />
 
-              {/* Protected App Routes */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/calculator" element={
-                <ProtectedRoute>
-                  <Calculator />
-                </ProtectedRoute>
-              } />
-              <Route path="/goals" element={
-                <ProtectedRoute>
-                  <Goals />
-                </ProtectedRoute>
-              } />
-              <Route path="/ai-coach" element={
-                <ProtectedRoute>
-                  <AiCoach />
-                </ProtectedRoute>
-              } />
-              <Route path="/receipt-scanner" element={
-                <ProtectedRoute>
-                  <ReceiptScanner />
-                </ProtectedRoute>
-              } />
-              <Route path="/reports" element={
-                <ProtectedRoute>
-                  <Reports />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile" element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              } />
+                {/* Protected App Routes */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/calculator" element={
+                  <ProtectedRoute>
+                    <Calculator />
+                  </ProtectedRoute>
+                } />
+                <Route path="/goals" element={
+                  <ProtectedRoute>
+                    <Goals />
+                  </ProtectedRoute>
+                } />
+                <Route path="/ai-coach" element={
+                  <ProtectedRoute>
+                    <AiCoach />
+                  </ProtectedRoute>
+                } />
+                <Route path="/receipt-scanner" element={
+                  <ProtectedRoute>
+                    <ReceiptScanner />
+                  </ProtectedRoute>
+                } />
+                <Route path="/reports" element={
+                  <ProtectedRoute>
+                    <Reports />
+                  </ProtectedRoute>
+                } />
+                <Route path="/achievements" element={
+                  <ProtectedRoute>
+                    <Achievements />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
 
-              {/* Fallback redirects */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
+                {/* Fallback redirects */}
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
+            </React.Suspense>
           </BrowserRouter>
         </CarbonProvider>
       </AuthProvider>
