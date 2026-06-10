@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FiCpu, FiRefreshCw, FiZap, FiAward } from 'react-icons/fi';
 import Layout from '../components/layout/Layout.js';
@@ -73,7 +73,7 @@ export default function AiCoach() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const fetchAiTips = async () => {
+  const fetchAiTips = useCallback(async () => {
     if (!user) return;
     try {
       setLoading(true);
@@ -89,7 +89,7 @@ export default function AiCoach() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   return (
     <Layout>

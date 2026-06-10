@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from 'react';
 
 interface ThemeContextType {
   isDark: boolean;
@@ -25,11 +25,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('ecotrack-theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
-  const toggleTheme = () => setIsDark(prev => !prev);
-  const setTheme = (dark: boolean) => setIsDark(dark);
+  const toggleTheme = useCallback(() => setIsDark(prev => !prev), []);
+  const setTheme = useCallback((dark: boolean) => setIsDark(dark), []);
+
+  const value = useMemo(() => ({ isDark, toggleTheme, setTheme }), [isDark, toggleTheme, setTheme]);
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

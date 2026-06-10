@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiPlusCircle, FiArrowLeft, FiArrowRight, FiCheck } from 'react-icons/fi';
@@ -9,6 +9,15 @@ import Input from '../components/ui/Input.js';
 import Badge from '../components/ui/Badge.js';
 import ProgressBar from '../components/ui/ProgressBar.js';
 import { useCarbon } from '../context/CarbonContext.js';
+
+const stepsList = [
+  { label: 'Date', desc: 'Logging period' },
+  { label: 'Transport', desc: 'Travel habits' },
+  { label: 'Energy', desc: 'Household usage' },
+  { label: 'Diet', desc: 'Nutrition footprint' },
+  { label: 'Waste', desc: 'Trash & recycling' },
+  { label: 'Results', desc: 'Footprint summary' },
+];
 
 export default function Calculator() {
   const navigate = useNavigate();
@@ -38,25 +47,42 @@ export default function Calculator() {
   const [foodWasteKg, setFoodWasteKg] = useState(0);
   const [recyclingRate, setRecyclingRate] = useState(0);
 
-  // Quick estimation constants
-  const estCar = carKm * 0.21;
-  const estBus = busKm * 0.089;
-  const estTrain = trainKm * 0.041;
-  const estFlight = flightHours * 250;
-  const estTrans = estCar + estBus + estTrain + estFlight;
+  // Quick estimation constants (memoized)
+  const { estTrans, estEnergy, estFood, estWaste, runningTotal } = useMemo(() => {
+    const estCar = carKm * 0.21;
+    const estBus = busKm * 0.089;
+    const estTrain = trainKm * 0.041;
+    const estFlight = flightHours * 250;
+    const estTrans = estCar + estBus + estTrain + estFlight;
 
-  const estElec = electricityKwh * 0.5;
-  const estAc = acHours * 1.5;
-  const estApp = applianceFactor === 'low' ? 0.5 : applianceFactor === 'high' ? 2.0 : 1.0;
-  const estEnergy = estElec + estAc + estApp;
+    const estElec = electricityKwh * 0.5;
+    const estAc = acHours * 1.5;
+    const estApp = applianceFactor === 'low' ? 0.5 : applianceFactor === 'high' ? 2.0 : 1.0;
+    const estEnergy = estElec + estAc + estApp;
 
-  const estFood = dietType === 'vegan' ? 2.89 : dietType === 'vegetarian' ? 3.81 : 7.19;
+    const estFood = dietType === 'vegan' ? 2.89 : dietType === 'vegetarian' ? 3.81 : 7.19;
 
-  const estPlastic = plasticBagCount * 0.033;
-  const estFoodWaste = foodWasteKg * 2.5;
-  const estWaste = (estPlastic + estFoodWaste) * (1 - recyclingRate / 100);
+    const estPlastic = plasticBagCount * 0.033;
+    const estFoodWaste = foodWasteKg * 2.5;
+    const estWaste = (estPlastic + estFoodWaste) * (1 - recyclingRate / 100);
 
-  const runningTotal = estTrans + estEnergy + estFood + estWaste;
+    const runningTotal = estTrans + estEnergy + estFood + estWaste;
+    
+    return { estTrans, estEnergy, estFood, estWaste, runningTotal };
+  }, [
+    carKm,
+    bikeKm,
+    busKm,
+    trainKm,
+    flightHours,
+    electricityKwh,
+    acHours,
+    applianceFactor,
+    dietType,
+    plasticBagCount,
+    foodWasteKg,
+    recyclingRate
+  ]);
 
   const handleNext = () => setStep((s) => s + 1);
   const handlePrev = () => setStep((s) => s - 1);
@@ -80,15 +106,6 @@ export default function Calculator() {
       setError(err.message || 'Failed to submit calculation entry');
     }
   };
-
-  const stepsList = [
-    { label: 'Date', desc: 'Logging period' },
-    { label: 'Transport', desc: 'Travel habits' },
-    { label: 'Energy', desc: 'Household usage' },
-    { label: 'Diet', desc: 'Nutrition footprint' },
-    { label: 'Waste', desc: 'Trash & recycling' },
-    { label: 'Results', desc: 'Footprint summary' },
-  ];
 
   return (
     <Layout>

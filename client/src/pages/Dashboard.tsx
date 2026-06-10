@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -47,6 +47,8 @@ const mockWeeklyData = [
   { week: 'Week 4', current: 65, previous: 72 },
 ];
 
+const totalEmissions = mockCategoryData.reduce((sum, d) => sum + d.value, 0);
+
 const container = {
   hidden: { opacity: 0 },
   show: {
@@ -82,8 +84,7 @@ export default function Dashboard() {
   const { isDark } = useTheme();
   const navigate = useNavigate();
 
-  const activeGoals = goals.filter((g) => g.status === 'active');
-  const totalEmissions = mockCategoryData.reduce((sum, d) => sum + d.value, 0);
+  const activeGoals = useMemo(() => goals.filter((g) => g.status === 'active'), [goals]);
   const textColor = isDark ? '#94a3b8' : '#64748b';
   const gridColor = isDark ? '#1e293b' : '#e2e8f0';
 

@@ -33,7 +33,7 @@ const sizeClasses: Record<ButtonSize, string> = {
   lg: 'px-7 py-3.5 text-base rounded-xl gap-2.5',
 };
 
-export default function Button({
+function Button({
   variant = 'primary',
   size = 'md',
   loading = false,
@@ -69,3 +69,5 @@ export default function Button({
     </motion.button>
   );
 }
+
+export default React.memo(Button);

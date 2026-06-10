@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FiTarget, FiPlus, FiTrash2, FiCheckCircle } from 'react-icons/fi';
 import Layout from '../components/layout/Layout.js';
@@ -25,7 +25,17 @@ export default function Goals() {
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [targetDate, setTargetDate] = useState('');
 
-  const filteredGoals = goals.filter((g) => g.status === activeTab);
+  const filteredGoals = useMemo(() => goals.filter((g) => g.status === activeTab), [goals, activeTab]);
+
+  const { activeCount, completedCount } = useMemo(() => {
+    let active = 0;
+    let completed = 0;
+    goals.forEach((g) => {
+      if (g.status === 'active') active++;
+      else if (g.status === 'completed') completed++;
+    });
+    return { activeCount: active, completedCount: completed };
+  }, [goals]);
 
   const handleCreateGoal = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +108,7 @@ export default function Goals() {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              {tab} Goals ({goals.filter((g) => g.status === tab).length})
+              {tab} Goals ({tab === 'active' ? activeCount : completedCount})
             </button>
           ))}
         </div>

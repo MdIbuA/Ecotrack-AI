@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FiFileText, FiPlus, FiArrowRight, FiAward } from 'react-icons/fi';
 import Layout from '../components/layout/Layout.js';
@@ -56,7 +56,7 @@ export default function Reports() {
   const [selectedMonth, setSelectedMonth] = useState('2026-06');
   const [selectedReport, setSelectedReport] = useState<ReportData | null>(mockReports[0]);
 
-  const handleGenerateReport = async () => {
+  const handleGenerateReport = useCallback(async () => {
     if (!user) return;
     try {
       setLoading(true);
@@ -76,7 +76,7 @@ export default function Reports() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, selectedMonth]);
 
   return (
     <Layout>

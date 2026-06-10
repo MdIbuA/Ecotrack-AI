@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiCamera, FiUploadCloud, FiTrash2, FiAward, FiCheckCircle } from 'react-icons/fi';
 import Layout from '../components/layout/Layout.js';
@@ -35,7 +35,15 @@ export default function ReceiptScanner() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedFile(file);
@@ -43,9 +51,9 @@ export default function ReceiptScanner() {
       setError('');
       setAnalysis(null);
     }
-  };
+  }, []);
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
@@ -58,19 +66,19 @@ export default function ReceiptScanner() {
         setError('Please upload an image file (PNG, JPG, WEBP)');
       }
     }
-  };
+  }, []);
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-  };
+  }, []);
 
-  const removeFile = () => {
+  const removeFile = useCallback(() => {
     setSelectedFile(null);
     setPreviewUrl(null);
     setAnalysis(null);
-  };
+  }, []);
 
-  const handleScan = async () => {
+  const handleScan = useCallback(async () => {
     if (!selectedFile || !user) return;
 
     try {
@@ -90,7 +98,7 @@ export default function ReceiptScanner() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedFile, user]);
 
   return (
     <Layout>

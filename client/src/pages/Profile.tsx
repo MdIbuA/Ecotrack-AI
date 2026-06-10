@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FiUser, FiSettings, FiSun, FiMoon, FiDownload, FiTrash2 } from 'react-icons/fi';
 import Layout from '../components/layout/Layout.js';
@@ -47,7 +47,7 @@ export default function Profile() {
     loadProfile();
   }, [user]);
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
+  const handleUpdateProfile = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
     try {
@@ -65,9 +65,9 @@ export default function Profile() {
     } finally {
       setSaving(false);
     }
-  };
+  }, [user, displayName, photoURL]);
 
-  const handleExportData = () => {
+  const handleExportData = useCallback(() => {
     const dataStr = JSON.stringify(profile || {}, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     const exportFileDefaultName = 'ecotrack-profile-export.json';
@@ -76,7 +76,7 @@ export default function Profile() {
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
-  };
+  }, [profile]);
 
   if (loading) {
     return (

@@ -33,7 +33,7 @@ const sizeMap = {
   lg: 'h-4',
 };
 
-export default function ProgressBar({
+function ProgressBar({
   value,
   max = 100,
   label,
@@ -88,3 +88,5 @@ export default function ProgressBar({
     </div>
   );
 }
+
+export default React.memo(ProgressBar);

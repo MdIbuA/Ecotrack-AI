@@ -42,7 +42,7 @@ export async function createEntry(req: Request, res: Response, next: NextFunctio
     
     let pointsAwarded = 0;
     let unlockedBadges: string[] = [];
-    let updatedProfile: any = null;
+    let updatedProfile: Partial<UserProfile> | null = null;
 
     if (userDoc.exists) {
       const profile = userDoc.data() as UserProfile;
@@ -120,8 +120,8 @@ export async function getEntries(req: Request, res: Response, next: NextFunction
     const snapshot = await query.get();
     let entries = snapshot.docs.map((doc: any) => doc.data() as CarbonEntry);
 
-    // Sort entries by date descending
-    entries.sort((a: CarbonEntry, b: CarbonEntry) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // Sort entries by date descending (lexicographical comparison)
+    entries.sort((a: CarbonEntry, b: CarbonEntry) => b.date.localeCompare(a.date));
 
     // Apply manual date filters if parameters are present
     if (startDate) {
@@ -231,36 +231,41 @@ export async function getDashboardStats(req: Request, res: Response, next: NextF
     }
 
     // Calculations
-    const totalEmissions = entries.reduce((sum: number, e: CarbonEntry) => sum + e.totalEmissions, 0);
-    const dailyAverage = totalEmissions / entries.length;
-
-    // Filters for weekly & monthly periods
     const today = new Date();
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(today.getDate() - 7);
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(today.getDate() - 30);
 
-    const thisWeekTotal = entries
-      .filter((e: CarbonEntry) => new Date(e.date) >= sevenDaysAgo)
-      .reduce((sum: number, e: CarbonEntry) => sum + e.totalEmissions, 0);
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
+    const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
 
-    const thisMonthTotal = entries
-      .filter((e: CarbonEntry) => new Date(e.date) >= thirtyDaysAgo)
-      .reduce((sum: number, e: CarbonEntry) => sum + e.totalEmissions, 0);
-
-    // Category breakdown
+    let totalEmissions = 0;
+    let thisWeekTotal = 0;
+    let thisMonthTotal = 0;
     let transportSum = 0;
     let energySum = 0;
     let foodSum = 0;
     let wasteSum = 0;
 
     entries.forEach((e: CarbonEntry) => {
-      transportSum += e.transportation.emissions || 0;
-      energySum += e.energy.emissions || 0;
-      foodSum += e.food.emissions || 0;
-      wasteSum += e.waste.emissions || 0;
+      totalEmissions += e.totalEmissions;
+      
+      // Lexicographical date comparison (YYYY-MM-DD)
+      if (e.date >= sevenDaysAgoStr) {
+        thisWeekTotal += e.totalEmissions;
+      }
+      if (e.date >= thirtyDaysAgoStr) {
+        thisMonthTotal += e.totalEmissions;
+      }
+
+      transportSum += e.transportation?.emissions || 0;
+      energySum += e.energy?.emissions || 0;
+      foodSum += e.food?.emissions || 0;
+      wasteSum += e.waste?.emissions || 0;
     });
+
+    const dailyAverage = totalEmissions / entries.length;
 
     const categorySum = transportSum + energySum + foodSum + wasteSum;
     const categoryBreakdown = [

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, type ReactNode } from 'react';
 import { apiService } from '../services/api.js';
 import type { CarbonEntry, CarbonEntryInput, Goal } from '../models/types.js';
 import { useAuth } from './AuthContext.js';
@@ -187,22 +187,34 @@ export function CarbonProvider({ children }: { children: ReactNode }) {
     }
   }, [user, fetchEntries, fetchGoals, fetchStats]);
 
+  const contextValue = useMemo(() => ({
+    entries,
+    goals,
+    stats,
+    loading,
+    fetchEntries,
+    fetchGoals,
+    fetchStats,
+    createEntry,
+    createGoal,
+    updateGoal,
+    deleteGoal,
+  }), [
+    entries,
+    goals,
+    stats,
+    loading,
+    fetchEntries,
+    fetchGoals,
+    fetchStats,
+    createEntry,
+    createGoal,
+    updateGoal,
+    deleteGoal,
+  ]);
+
   return (
-    <CarbonContext.Provider
-      value={{
-        entries,
-        goals,
-        stats,
-        loading,
-        fetchEntries,
-        fetchGoals,
-        fetchStats,
-        createEntry,
-        createGoal,
-        updateGoal,
-        deleteGoal,
-      }}
-    >
+    <CarbonContext.Provider value={contextValue}>
       {children}
     </CarbonContext.Provider>
   );

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from 'react';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -45,6 +45,7 @@ function getMockUser(): MockUser | null {
   return stored ? JSON.parse(stored) : null;
 }
 
+// ... rest remains same until AuthProvider ...
 function setMockUser(user: MockUser | null) {
   if (user) {
     localStorage.setItem('ecotrack-mock-user', JSON.stringify(user));
@@ -107,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const login = async (email: string, _password: string) => {
+  const login = useCallback(async (email: string, _password: string) => {
     if (isMockMode) {
       const mockUser: MockUser = {
         uid: 'mock-' + Date.now(),
@@ -123,9 +124,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!auth) throw new Error('Firebase not initialized');
     const result = await signInWithEmailAndPassword(auth, email, _password);
     setUser(toAuthUser(result.user));
-  };
+  }, []);
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = useCallback(async (name: string, email: string, password: string) => {
     if (isMockMode) {
       const mockUser: MockUser = {
         uid: 'mock-' + Date.now(),
@@ -142,9 +143,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(result.user, { displayName: name });
     setUser(toAuthUser(result.user));
-  };
+  }, []);
 
-  const loginWithGoogle = async () => {
+  const loginWithGoogle = useCallback(async () => {
     if (isMockMode) {
       const mockUser: MockUser = {
         uid: 'mock-google-' + Date.now(),
@@ -161,9 +162,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     setUser(toAuthUser(result.user));
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     if (isMockMode) {
       setMockUser(null);
       setUser(null);
@@ -173,9 +174,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!auth) throw new Error('Firebase not initialized');
     await signOut(auth);
     setUser(null);
-  };
+  }, []);
 
-  const resetPassword = async (email: string) => {
+  const resetPassword = useCallback(async (email: string) => {
     if (isMockMode) {
       // Simulate a delay
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -184,10 +185,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!auth) throw new Error('Firebase not initialized');
     await sendPasswordResetEmail(auth, email);
-  };
+  }, []);
+
+  const contextValue = useMemo(() => ({
+    user,
+    loading,
+    login,
+    register,
+    loginWithGoogle,
+    logout,
+    resetPassword
+  }), [user, loading, login, register, loginWithGoogle, logout, resetPassword]);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, loginWithGoogle, logout, resetPassword }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
